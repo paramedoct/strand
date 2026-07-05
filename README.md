@@ -1,4 +1,4 @@
-## MANTRA
+## MARIONETTE
 - Hostname resolution
 - Address resolution
 - Connection management ( OpenSSH )
