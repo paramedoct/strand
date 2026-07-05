@@ -1,4 +1,4 @@
-# mantra agent guide
+# marionette agent guide
 
 ## mission
 

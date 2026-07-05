@@ -22,8 +22,8 @@ main() {
   if ! host_exists "$alias"; then
     return 1
   fi
-  host_write_ssh_config "$MANTRA_GENERATED_CONFIG_FILE"
-  exec ssh -F "$MANTRA_GENERATED_CONFIG_FILE" "$alias" "$@"
+  host_write_ssh_config "$MARIONETTE_GENERATED_CONFIG_FILE"
+  exec ssh -F "$MARIONETTE_GENERATED_CONFIG_FILE" "$alias" "$@"
 }
 
 main "$@"
