@@ -8,11 +8,11 @@ usage() {
 }
 
 # shellcheck source=/dev/null
-source "$ROOT_DIR/../utils/source.sh"
+source "$ROOT_DIR/utils/source.sh"
 source_modules \
-  ../utils/host.sh \
-  ../utils/profile.sh \
-  ../utils/table.sh
+  utils/host.sh \
+  utils/profile.sh \
+  utils/table.sh
 
 status_add_host_row() {
   table_add_row "$1" "$2" "${4:--}"

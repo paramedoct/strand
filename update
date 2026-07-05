@@ -4,15 +4,15 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 
 # shellcheck source=/dev/null
-source "$ROOT_DIR/../utils/source.sh"
+source "$ROOT_DIR/utils/source.sh"
 source_modules \
-  ../utils/abstracts/$OS.sh \
-  ../utils/host.sh \
-  ../utils/network.sh \
-  ../utils/pair.sh \
-  ../utils/profile.sh \
-  ../utils/ssh.sh \
-  ../utils/table.sh
+  utils/abstracts/$OS.sh \
+  utils/host.sh \
+  utils/network.sh \
+  utils/pair.sh \
+  utils/profile.sh \
+  utils/ssh.sh \
+  utils/table.sh
 
 main() {
   local neighbors
