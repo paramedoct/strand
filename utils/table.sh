@@ -109,17 +109,6 @@ table_truncate() {
   fi
 }
 
-table_separator_cell() {
-  local index
-  index=$1
-  printf '%*s' "${TABLE_WIDTHS[$index]}" '' | tr ' ' '-'
-  if ((index == TABLE_COLUMN_COUNT - 1)); then
-    printf '%s\n' '-'
-  else
-    printf ' '
-  fi
-}
-
 table_print_cell() {
   local index
   local value
@@ -144,19 +133,10 @@ table_print_row() {
   done
 }
 
-table_print_separator() {
-  local index
-  for ((index = 0; index < TABLE_COLUMN_COUNT; index++)); do
-    table_separator_cell "$index"
-  done
-}
-
 table_print() {
   local row
   local -a fields
   table_fit_terminal
-  table_print_row "${TABLE_HEADERS[@]}"
-  table_print_separator
   if [ "${#TABLE_ROWS[@]}" -eq 0 ]; then
     return 0
   fi

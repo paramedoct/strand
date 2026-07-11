@@ -27,28 +27,9 @@ pair_add() {
 }
 
 pair_print() {
-  local line_width
-  local separator_width
   local index
-  local line
   local key
   local value
-  line_width=0
-  for ((index = 0; index < ${#PAIR_KEYS[@]}; index++)); do
-    key="${PAIR_KEYS[$index]}"
-    value="${PAIR_VALUES[$index]}"
-    line="${key}$(printf '%*s' "$((PAIR_KEY_WIDTH - ${#key} + 1))" '')${value}"
-    if ((${#line} > line_width)); then
-      line_width=${#line}
-    fi
-  done
-  separator_width=${#PAIR_TITLE}
-  if ((line_width > separator_width)); then
-    separator_width=$line_width
-  fi
-  separator_width=$((separator_width + 1))
-  echo "$PAIR_TITLE"
-  printf '%*s\n' "$separator_width" '' | tr ' ' '-'
   for ((index = 0; index < ${#PAIR_KEYS[@]}; index++)); do
     key="${PAIR_KEYS[$index]}"
     value="${PAIR_VALUES[$index]}"
