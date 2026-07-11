@@ -84,6 +84,18 @@ host_record_for() {
   ' <<<"$records"
 }
 
+host_alias_for_fingerprint() {
+  local fingerprint
+  fingerprint=$1
+  [ -n "$fingerprint" ] && [ "$fingerprint" != "-" ] || return 1
+  awk -F '[ ]+' -v fingerprint="$fingerprint" '
+    $1 != "" && $4 == fingerprint {
+      print $1
+      exit
+    }
+  ' "$MARIONETTE_HOSTS_FILE"
+}
+
 host_key_alias() {
   printf 'marionette-%s\n' "$1"
 }

@@ -33,14 +33,16 @@ network_neighbors_records() {
 
 network_neighbors_print() {
   local ip
+  local host
   local fingerprint
   local records
   records=${1:-}
   table_reset
-  table_set_headers "IP" "SSH"
+  table_set_headers "HOST" "SSH"
   while IFS=$'\t' read -r ip fingerprint _; do
     [[ -n "${ip:-}" ]] || continue
-    table_add_row "$ip" "$fingerprint"
+    host=$(host_alias_for_fingerprint "$fingerprint" || true)
+    table_add_row "${host:-$ip}" "$fingerprint"
   done <<<"$records"
   table_print
 }
