@@ -15,14 +15,14 @@ source_modules \
   utils/table.sh
 
 status_add_host_row() {
-  table_add_row "$1" "$2" "${4:--}"
+  table_add_row "$1" "$2" "$3"
 }
 
 main() {
   [ "$#" -eq 0 ] || usage
   profile_prepare
   table_reset
-  table_set_headers ALIAS USER SSH
+  table_set_headers ALIAS USER IP
   host_each status_add_host_row
   table_print
 }
