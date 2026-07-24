@@ -1,5 +1,5 @@
 ## MARIONETTE
 - Hostname resolution
-- Address resolution
+- Endpoint remap
 - Connection management ( OpenSSH )
 <br></br>
