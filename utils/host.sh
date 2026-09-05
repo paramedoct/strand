@@ -1,11 +1,11 @@
 host_exists() {
   local alias
   alias=$1
-  if [ ! -f "$MARIONETTE_HOSTS_FILE" ]; then
+  if [ ! -f "$STRAND_HOSTS_FILE" ]; then
     return 1
   fi
   awk -F '[ ]+' -v alias="$alias" \
-    '$1 == alias { found = 1 } END { exit !found }' "$MARIONETTE_HOSTS_FILE"
+    '$1 == alias { found = 1 } END { exit !found }' "$STRAND_HOSTS_FILE"
 }
 
 host_each() {
@@ -16,13 +16,13 @@ host_each() {
   local fingerprint
   callback=$1
   shift
-  if [ ! -f "$MARIONETTE_HOSTS_FILE" ]; then
+  if [ ! -f "$STRAND_HOSTS_FILE" ]; then
     return 0
   fi
   while IFS=' ' read -r alias user hostname fingerprint; do
     [ -n "$alias" ] || continue
     "$callback" "$alias" "$user" "$hostname" "$fingerprint" "$@"
-  done <"$MARIONETTE_HOSTS_FILE"
+  done <"$STRAND_HOSTS_FILE"
 }
 
 host_add() {
@@ -39,7 +39,7 @@ host_add() {
     "$user" \
     "$hostname" \
     "$fingerprint" \
-    >>"$MARIONETTE_HOSTS_FILE"
+    >>"$STRAND_HOSTS_FILE"
 }
 
 host_replace() {
@@ -93,11 +93,11 @@ host_alias_for_fingerprint() {
       print $1
       exit
     }
-  ' "$MARIONETTE_HOSTS_FILE"
+  ' "$STRAND_HOSTS_FILE"
 }
 
 host_key_alias() {
-  printf 'marionette-%s\n' "$1"
+  printf 'strand-%s\n' "$1"
 }
 
 host_sync_hosts() {
@@ -121,14 +121,14 @@ host_sync_hosts() {
       hostname=$matched_host
     fi
     printf '%s %s %s %s\n' "$alias" "$user" "$hostname" "$fingerprint"
-  done <"$MARIONETTE_HOSTS_FILE"
+  done <"$STRAND_HOSTS_FILE"
 }
 
 host_sync() {
   local records
   records=${1:-}
   [ -n "$records" ] || return 0
-  host_replace "$MARIONETTE_HOSTS_FILE" host_sync_hosts "$records"
+  host_replace "$STRAND_HOSTS_FILE" host_sync_hosts "$records"
 }
 
 host_remove_hosts() {
@@ -151,7 +151,7 @@ host_remove_hosts() {
       "$user" \
       "$hostname" \
       "$fingerprint"
-  done <"$MARIONETTE_HOSTS_FILE"
+  done <"$STRAND_HOSTS_FILE"
 }
 
 host_remove_known_hosts() {
@@ -171,14 +171,14 @@ host_remove_known_hosts() {
       continue
     fi
     printf '%s\n' "$line"
-  done <"$MARIONETTE_KNOWN_HOSTS_FILE"
+  done <"$STRAND_KNOWN_HOSTS_FILE"
 }
 
 host_remove() {
   local alias
   alias=$1
-  host_replace "$MARIONETTE_HOSTS_FILE" host_remove_hosts "$alias"
-  host_replace "$MARIONETTE_KNOWN_HOSTS_FILE" host_remove_known_hosts "$alias"
+  host_replace "$STRAND_HOSTS_FILE" host_remove_hosts "$alias"
+  host_replace "$STRAND_KNOWN_HOSTS_FILE" host_remove_known_hosts "$alias"
 }
 
 host_write_ssh_config() {
@@ -188,8 +188,8 @@ host_write_ssh_config() {
   local hostname
   local key_alias
   output=$1
-  if [ ! -f "$MARIONETTE_KNOWN_HOSTS_FILE" ]; then
-    : >"$MARIONETTE_KNOWN_HOSTS_FILE"
+  if [ ! -f "$STRAND_KNOWN_HOSTS_FILE" ]; then
+    : >"$STRAND_KNOWN_HOSTS_FILE"
   fi
   : >"$output"
   while IFS=' ' read -r alias user hostname _; do
@@ -200,10 +200,10 @@ Host $alias
   HostName $hostname
   User $user
   HostKeyAlias $key_alias
-  UserKnownHostsFile $MARIONETTE_KNOWN_HOSTS_FILE
+  UserKnownHostsFile $STRAND_KNOWN_HOSTS_FILE
 
 EOF2
-  done <"$MARIONETTE_HOSTS_FILE"
+  done <"$STRAND_HOSTS_FILE"
 }
 
 host_prepare_connection() {
@@ -220,8 +220,8 @@ host_prepare_connection() {
   [ -n "$fingerprint" ] || return 1
   key_alias=$(host_key_alias "$alias")
   known_key="$key_alias ${key#* }"
-  if ! grep -Fqx "$known_key" "$MARIONETTE_KNOWN_HOSTS_FILE" 2>/dev/null; then
-    printf '%s\n' "$known_key" >>"$MARIONETTE_KNOWN_HOSTS_FILE"
+  if ! grep -Fqx "$known_key" "$STRAND_KNOWN_HOSTS_FILE" 2>/dev/null; then
+    printf '%s\n' "$known_key" >>"$STRAND_KNOWN_HOSTS_FILE"
   fi
   printf '%s\n' "$fingerprint"
 }
