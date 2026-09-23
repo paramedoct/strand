@@ -48,7 +48,7 @@ network_neighbors_print() {
 }
 
 network_neighbors_scan() {
-  nmap -sT -Pn -n -p 22 --open "$@" 2>/dev/null
+  network_scan "$@"
 }
 
 network_neighbors_parse() {

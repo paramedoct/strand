@@ -1,3 +1,7 @@
+network_scan() {
+  nmap -sT -Pn -n -p 22 --open "$@" 2>/dev/null
+}
+
 inspect_network() {
   local cidr
   local gateway

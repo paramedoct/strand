@@ -1,3 +1,21 @@
+network_scan() {
+  (
+    local hard_limit
+    local limit
+    hard_limit=$(ulimit -Hn) || return
+    # Nmap narrows RLIM_INFINITY to int and falls back to five sockets.
+    # A finite hard limit prevents max_sd() from restoring infinity.
+    # Match Darwin's default FD_SETSIZE; honor stricter inherited limits.
+    limit=1024
+    if [[ "$hard_limit" != unlimited ]] && ((hard_limit < limit)); then
+      limit=$hard_limit
+    fi
+    ulimit -Sn "$limit" || return
+    ulimit -Hn "$limit" || return
+    nmap -sT -Pn -n -p 22 --open "$@" 2>/dev/null
+  )
+}
+
 inspect_network() {
   local gateway
   local iface
