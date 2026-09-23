@@ -2,7 +2,7 @@ network_scan() {
   nmap -sT -Pn -n -p 22 --open "$@" 2>/dev/null
 }
 
-inspect_network() {
+network_inspect() {
   local cidr
   local gateway
   local iface

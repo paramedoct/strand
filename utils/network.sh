@@ -3,7 +3,7 @@ network_local() {
   local iface
   local me
   local subnet_cidr
-  IFS=$'\t' read -r gateway iface me subnet_cidr <<<"$(inspect_network)"
+  IFS=$'\t' read -r gateway iface me subnet_cidr <<<"$(network_inspect)"
   [[ -n "${gateway:-}" && -n "${iface:-}" && -n "${me:-}" \
     && -n "${subnet_cidr:-}" ]] || return 1
   pair_reset
