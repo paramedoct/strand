@@ -1,16 +1,14 @@
 network_scan() {
-  (
-    local hard_limit
-    local limit
-    hard_limit=$(ulimit -Hn) || return
-    limit=1024
-    if [[ "$hard_limit" != unlimited ]] && ((hard_limit < limit)); then
-      limit=$hard_limit
-    fi
-    ulimit -Sn "$limit" || return
-    ulimit -Hn "$limit" || return
-    nmap -sT -Pn -n -p 22 --open "$@" 2>/dev/null
-  )
+  local hard_limit
+  local limit
+  hard_limit=$(ulimit -Hn) || return
+  limit=1024
+  if [[ "$hard_limit" != unlimited ]] && ((hard_limit < limit)); then
+    limit=$hard_limit
+  fi
+  ulimit -Sn "$limit" || return
+  ulimit -Hn "$limit" || return
+  nmap -sT -Pn -n -p 22 --open "$@" 2>/dev/null
 }
 
 network_inspect() {
