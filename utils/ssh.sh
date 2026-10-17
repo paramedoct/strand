@@ -5,13 +5,17 @@ ssh_download() {
   local destination
   alias=$1
   path=$2
+  shift 2
+  while [ "${path%/}" != "$path" ]; do
+    path=${path%/}
+  done
   case "$alias" in
     ""|.|..|-*|*[!a-zA-Z0-9._-]*)
       return 1
       ;;
   esac
   case "$path" in
-    ""|*/|*\**|*\?*|*\[*|*\]*)
+    ""|*\**|*\?*|*\[*|*\]*)
       return 1
       ;;
   esac
@@ -25,11 +29,8 @@ ssh_download() {
     relative_path=${relative_path#/}
   done
   destination="/tmp/$alias/$relative_path"
-  if [ -d "$destination" ]; then
-    return 1
-  fi
   mkdir -p "${destination%/*}"
-  scp -F "$STRAND_GENERATED_CONFIG_FILE" "$alias:$path" "$destination"
+  scp -F "$STRAND_GENERATED_CONFIG_FILE" "$@" "$alias:$path" "${destination%/*}/"
 }
 
 ssh_fingerprint_from_key() {

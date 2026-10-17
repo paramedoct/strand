@@ -4,7 +4,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 usage() {
   echo "$0 <alias> [ssh args...]" >&2
-  echo "$0 <alias>:<path>" >&2
+  echo "$0 <alias>:<path> [scp args...]" >&2
   exit 1
 }
 
@@ -22,9 +22,6 @@ main() {
   target=$1
   alias=${target%%:*}
   shift
-  case "$target" in
-    *:*) [ "$#" -eq 0 ] || usage ;;
-  esac
   profile_prepare
   if ! host_exists "$alias"; then
     return 1
@@ -32,7 +29,7 @@ main() {
   host_write_ssh_config "$STRAND_GENERATED_CONFIG_FILE"
   case "$target" in
     *:*)
-      ssh_download "$alias" "${target#*:}"
+      ssh_download "$alias" "${target#*:}" "$@"
       return
       ;;
   esac
