@@ -1,3 +1,37 @@
+ssh_download() {
+  local alias
+  local path
+  local relative_path
+  local destination
+  alias=$1
+  path=$2
+  case "$alias" in
+    ""|.|..|-*|*[!a-zA-Z0-9._-]*)
+      return 1
+      ;;
+  esac
+  case "$path" in
+    ""|*/|*\**|*\?*|*\[*|*\]*)
+      return 1
+      ;;
+  esac
+  case "/$path/" in
+    */../*|*/./*)
+      return 1
+      ;;
+  esac
+  relative_path=$path
+  while [ "${relative_path#/}" != "$relative_path" ]; do
+    relative_path=${relative_path#/}
+  done
+  destination="/tmp/$alias/$relative_path"
+  if [ -d "$destination" ]; then
+    return 1
+  fi
+  mkdir -p "${destination%/*}"
+  scp -F "$STRAND_GENERATED_CONFIG_FILE" "$alias:$path" "$destination"
+}
+
 ssh_fingerprint_from_key() {
   local key
   local output

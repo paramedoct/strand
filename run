@@ -4,6 +4,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 usage() {
   echo "$0 <alias> [ssh args...]" >&2
+  echo "$0 <alias>:<path>" >&2
   exit 1
 }
 
@@ -11,18 +12,30 @@ usage() {
 source "$ROOT_DIR/utils/source.sh"
 source_modules \
   utils/host.sh \
-  utils/profile.sh
+  utils/profile.sh \
+  utils/ssh.sh
 
 main() {
   local alias
+  local target
   [ "$#" -ge 1 ] || usage
-  alias=$1
+  target=$1
+  alias=${target%%:*}
   shift
+  case "$target" in
+    *:*) [ "$#" -eq 0 ] || usage ;;
+  esac
   profile_prepare
   if ! host_exists "$alias"; then
     return 1
   fi
   host_write_ssh_config "$STRAND_GENERATED_CONFIG_FILE"
+  case "$target" in
+    *:*)
+      ssh_download "$alias" "${target#*:}"
+      return
+      ;;
+  esac
   exec ssh -F "$STRAND_GENERATED_CONFIG_FILE" "$alias" "$@"
 }
 
