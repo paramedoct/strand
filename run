@@ -16,8 +16,8 @@ source_modules \
   utils/ssh.sh
 
 main() {
-  local alias
   local target
+  local alias
   [ "$#" -ge 1 ] || usage
   target=$1
   alias=${target%%:*}
