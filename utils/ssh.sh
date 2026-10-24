@@ -1,8 +1,11 @@
 ssh_download() {
   local alias
   local path
-  local relative_path
   local destination
+  local timestamp
+  local sequence
+  local staging
+  local status
   alias=$1
   path=$2
   shift 2
@@ -24,14 +27,52 @@ ssh_download() {
       return 1
       ;;
   esac
-  relative_path=$path
-  while [ "${relative_path#/}" != "$relative_path" ]; do
-    relative_path=${relative_path#/}
+  mkdir -p "/tmp/$alias" || return 1
+  timestamp=$(date +%Y%m%d-%H%M%S)
+  destination="/tmp/$alias/$timestamp"
+  sequence=0
+  while ! mkdir "$destination" 2>/dev/null; do
+    if [ ! -e "$destination" ] && [ ! -L "$destination" ]; then
+      printf 'Could not create download directory: %s\n' "$destination" >&2
+      return 1
+    fi
+    sequence=$((sequence + 1))
+    destination="/tmp/$alias/$timestamp-$sequence"
   done
-  destination="/tmp/$alias/$relative_path"
-  mkdir -p "${destination%/*}"
-  scp -F "$STRAND_GENERATED_CONFIG_FILE" "$@" "$alias:$path" "${destination%/*}/"
+  staging=$(mktemp -d "$destination/.download.XXXXXX") || return 1
+  if scp -F "$STRAND_GENERATED_CONFIG_FILE" "$@" "$alias:$path" "$staging/"; then
+    ssh_download_place "$staging" "$destination" || return 1
+    printf '%s\n' "$destination"
+  else
+    status=$?
+    printf 'Download failed; partial files may remain in: %s\n' "$staging" >&2
+    return "$status"
+  fi
 }
+
+ssh_download_place() (
+  local staging
+  local destination
+  local directory
+  staging=$1
+  destination=$2
+  shopt -s dotglob nullglob
+  set -- "$staging"/*
+  if [ "$#" -eq 1 ] && [ -d "$1" ]; then
+    directory=$1
+    set -- "$directory"/*
+    if [ "$#" -gt 0 ]; then
+      mv -- "$@" "$destination/" || return 1
+    fi
+    rmdir -- "$directory" || return 1
+  elif [ "$#" -gt 0 ]; then
+    mv -- "$@" "$destination/" || return 1
+  else
+    printf 'Download returned no files: %s\n' "$staging" >&2
+    return 1
+  fi
+  rmdir -- "$staging"
+)
 
 ssh_fingerprint_from_key() {
   local key
