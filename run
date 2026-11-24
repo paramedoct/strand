@@ -33,7 +33,12 @@ main() {
       return
       ;;
   esac
-  exec ssh -F "$STRAND_GENERATED_CONFIG_FILE" "$alias" "$@"
+  exec ssh \
+    -F "$STRAND_GENERATED_CONFIG_FILE" \
+    -o ServerAliveInterval=5 \
+    -o ServerAliveCountMax=1 \
+    "$alias" \
+    "$@"
 }
 
 main "$@"
